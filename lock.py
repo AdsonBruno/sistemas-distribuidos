@@ -13,6 +13,10 @@ class Lock:
     self._locked = True
     self._lock.release()
 
+  def release(self):
+    self._lock.acquire()
+    self._locked = False
+    self._lock.release()
 
   def is_locked(self): 
     return self._locked
