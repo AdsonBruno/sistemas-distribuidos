@@ -5,6 +5,9 @@ def main():
 
   lock.acquire()
 
+  locked_by = lock.locked_by()
+  print('Bloqueio adquirido pela thread: ',  locked_by)
+
   if lock.is_locked():
     print('Bloqueio adquirido')
   else: 

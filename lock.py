@@ -4,6 +4,7 @@ class Lock:
   def __init__(self):
     self._lock = threading.Lock()
     self._locked = False
+    self._locked_by = None
 
   def acquire(self): 
     self._lock.acquire()
@@ -11,6 +12,7 @@ class Lock:
       self._lock.release()
       self._lock.acquire()
     self._locked = True
+    self._locked_by = threading.current_thread().name
     self._lock.release()
 
   def release(self):
@@ -21,4 +23,6 @@ class Lock:
   def is_locked(self): 
     return self._locked
 
+  def locked_by(self):
+    return self._locked_by
     
