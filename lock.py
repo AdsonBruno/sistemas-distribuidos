@@ -29,6 +29,13 @@ class Lock:
   def release(self):
     self._lock.acquire()
     self._locked = False
+
+    if self._request_queue:
+      next_thread = self._request_queue[0]
+      self._locked = True
+      self._locked_by = next_thread
+      self._request_queue.remove(next_thread)
+      
     self._lock.release()
 
   def is_locked(self): 
@@ -39,8 +46,10 @@ class Lock:
   
   def __enter__(self):
       self.acquire()
+      return True
 
   def __exit__(self, exc_type, exc_value, traceback):
       self.release()
+      return False
 
   

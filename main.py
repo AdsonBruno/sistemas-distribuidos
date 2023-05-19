@@ -3,7 +3,7 @@ from shared_resource import SharedResource
 import threading
 
 def worker(lock, resource):
-  lock.acquire()
+
   locked_by = lock.locked_by()
   print(f'Bloqueio adquirido pela thread: {locked_by}')
   resource.do_something()
@@ -11,14 +11,14 @@ def worker(lock, resource):
 
 def main():
   lock = Lock()
-  resource = SharedResource(lock)
+  resource = SharedResource()
 
   thread = threading.Thread(target=worker, args=(lock, resource))
 
   thread.start()
   thread.join()
 
-  lock.acquire()
+  # lock.acquire()
 
   locked_by = lock.locked_by()
   print(f'Bloqueio adquirido pela thread: {locked_by}')
@@ -29,6 +29,11 @@ def main():
     print('Bloqueio não adquirido')
   
   lock.release()
+
+  if lock.is_locked():
+    print('Recurso ainda está bloqueado')
+  else:
+    print('Recurso está liberado')
 
 if __name__ == '__main__':
   main()

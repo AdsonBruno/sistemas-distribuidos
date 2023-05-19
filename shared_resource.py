@@ -1,9 +1,9 @@
 from lock import Lock
 
 class SharedResource:
-  def __init__(self, lock):
+  def __init__(self):
     self._counter = 0
-    self._lock = lock
+    self._lock = Lock()
   
   def do_something(self):
     with self._lock:
