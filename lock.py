@@ -11,12 +11,11 @@ class Lock:
     while self._locked:
       self._lock.release()
       self._lock.acquire()
+    
     self._locked = True
     self._locked_by = threading.current_thread().name
-    self._lock.release()
 
   def release(self):
-    self._lock.acquire()
     self._locked = False
     self._lock.release()
 
