@@ -7,6 +7,7 @@ def worker(lock, resource):
     locked_by = lock.locked_by()
     print(f'Bloqueio adquirido pela thread: {locked_by}')
     resource.do_something()
+    resource.release()
 
 def main():
   lock = Lock()
