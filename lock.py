@@ -8,19 +8,26 @@ class Lock:
     self._request_queue = []
 
   def acquire(self): 
+    thread = threading.current_thread()
     self._lock.acquire()
+
     self._request_queue.append(threading.current_thread().name)
-    while self._locked or self._request_queue[0] != threading.current_thread().name:
+    while self._locked and self._locked_by != thread:
+      if thread not in self._request_queue:
+        self._request_queue.append(thread)
       self._lock.release()
       self._lock.acquire()
     
     self._locked = True
-    self._locked_by = threading.current_thread().name
+    self._locked_by = thread
+    
+    if thread in self._request_queue:
+      self._request_queue.remove(thread)
+    
     self._lock.release()
 
   def release(self):
     self._lock.acquire()
-    self._request_queue.pop(0)
     self._locked = False
     self._lock.release()
 
@@ -29,4 +36,11 @@ class Lock:
 
   def locked_by(self):
     return self._locked_by
-    
+  
+  def __enter__(self):
+      self.acquire()
+
+  def __exit__(self, exc_type, exc_value, traceback):
+      self.release()
+
+  

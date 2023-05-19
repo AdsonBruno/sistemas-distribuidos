@@ -11,13 +11,13 @@ def worker(lock, resource):
 
 def main():
   lock = Lock()
-  resource = SharedResource()
+  resource = SharedResource(lock)
 
   thread = threading.Thread(target=worker, args=(lock, resource))
-  thread.start()
 
+  thread.start()
   thread.join()
-  
+
   lock.acquire()
 
   locked_by = lock.locked_by()
