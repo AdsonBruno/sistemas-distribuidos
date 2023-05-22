@@ -1,53 +1,36 @@
-import threading
+import threading 
+from socket import socket, AF_INET, SOCK_STREAM
 
-class Lock: 
-  def __init__(self):
-    self._lock = threading.Lock()
+class DistributedLock: 
+  def __init__(self, hostname, port=1234):
+    self._hostname = hostname
+    self._port = port
     self._locked = False
     self._locked_by = None
-    self._request_queue = []
+    self._socket = None
 
   def acquire(self): 
-    thread = threading.current_thread().name
-    self._lock.acquire()
+    self._socket = socket(AF_INET, SOCK_STREAM)
+    self._socket.connect((self._hostname, self._port))
+    self._socket.send(b'acquire')
+    response = self._socket.recv(1024).decode()
 
-    self._request_queue.append(thread)
-    while self._locked and self._locked_by != thread:
-      if thread not in self._request_queue:
-        self._request_queue.append(thread)
-      self._lock.release()
-      self._lock.acquire()
-    
-    self._locked = True
-    self._locked_by = thread
-    
-    if thread in self._request_queue:
-      self._request_queue.remove(thread)
-    
-    self._lock.release()
+    if response == 'granted':
+      self._locked = True
+      self._locked_by = threading.current_thread().name
 
   def release(self):
-    self._lock.acquire()
-    self._locked = False
-
-    if self._request_queue:
-      next_thread = self._request_queue[0]
-      self._locked = True
-      self._locked_by = next_thread
-      self._request_queue.remove(next_thread)
-
-    self._lock.release()
-
-  def is_locked(self): 
+    if self._locked:
+      self._socket.send(b'release')
+      self._socket.close()
+      self._locked = False
+      self._locked_by = None
+  
+  @property
+  def locked(self):
     return self._locked
-
+  
+  @property
   def locked_by(self):
     return self._locked_by
-  
-  def __enter__(self):
-      self.acquire()
-
-  def __exit__(self, exc_type, exc_value, traceback):
-      self.release()
-
-  
+    
