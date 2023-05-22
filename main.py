@@ -1,4 +1,4 @@
-from lock import Lock
+from lock import DistributedLock
 from shared_resource import SharedResource
 import threading
 
@@ -10,7 +10,7 @@ def worker(lock, resource):
     resource.release()
 
 def main():
-  lock = Lock()
+  lock = DistributedLock()
   resource = SharedResource()
 
   thread = threading.Thread(target=worker, args=(lock, resource))

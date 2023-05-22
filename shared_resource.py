@@ -1,10 +1,10 @@
-from lock import Lock
+from lock import DistributedLock
 from threading import Condition
 
 class SharedResource:
   def __init__(self):
     self._counter = 0
-    self._lock = Lock()
+    self._lock = DistributedLock()
     self._condition = Condition(self._lock)
   
   def do_something(self):
